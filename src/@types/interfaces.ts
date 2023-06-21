@@ -1,3 +1,3 @@
 interface callback { (args?: any): void }
 
-export {callback}
+export type {callback}

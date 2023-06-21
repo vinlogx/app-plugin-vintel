@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-
     "target": "es2017",
     "lib": ["dom", "es2017"],
     // "jsx": "preserve",                                /* Specify what JSX code is generated. */
@@ -96,7 +95,7 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "pretty": true,
-    "sourceMap": true,
+    "sourceMap": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/__tests__/*"]

@@ -1,5 +1,4 @@
 type VintelEvent = {
-  name: String,
-  callback: (args ?: any) => void
-}
-
+  name: string;
+  callback: (args?: object | string) => void;
+};
