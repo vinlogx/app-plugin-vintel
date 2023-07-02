@@ -1,4 +1,4 @@
-import { callback } from '../@types/interfaces';
+import { callback } from '../definitions';
 
 interface EventLister {
   name: string;

@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 // Utils
-import { callback } from './@types/interfaces';
+import AWSS3 from './AWS_S3';
+import { AWSOptions, callback } from './definitions';
 import VintelEvent from './Event/VintelEvent';
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
@@ -36,6 +37,36 @@ const vintel: any = {
   completeOTA: false,
   oTAVersion: '03.06',
   versionNumber: 0,
+  s3Client: null,
+  appConfig: null,
+  firmwareUpdate: null,
+  init: function (config: AWSOptions) {
+    return new Promise(async (resolve, reject) => {
+      const awsOpts = config ?? {
+        mode: 'prod',
+        aws: {
+          region: 'us-east-2',
+          credentials: {
+            accessKeyId: 'AKIAZCNVN6KBI3YGOVL5',
+            secretAccessKey: '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',
+          },
+        },
+      };
+      try {
+        vintel.s3Client = new AWSS3(awsOpts);
+        let configData = await vintel.s3Client.getConfig();
+        configData = JSON.parse(configData);
+        console.log('AWS', typeof configData);
+        vintel.appConfig = configData;
+        vintel.oTAVersion = configData.OTAVesrsion || configData.OTAVersion;
+
+        resolve(configData);
+      } catch (err: any) {
+        console.log('AWS Error', err);
+        reject(err);
+      }
+    });
+  },
   scan: function (options: any, success: callback, failure: callback) {
     const services = options.services || [];
     const duration = options.seconds || 30;
@@ -460,6 +491,8 @@ const vintel: any = {
   checkOTA: function (success: callback, failure: callback) {
     console.log(
       'Check Ota Version ____________________________________' + vintel.oTAVersion + '!=   ' + vintel.versionNumber,
+      'APP Config: ',
+      vintel.appConfig,
     );
     if (vintel.oTAVersion !== vintel.versionNumber) {
       // Confirm Dialog needs to be shown
@@ -734,5 +767,6 @@ const httpRequest = async (type: number, data: any) => {
 //   }
 // }
 
-module.exports = vintel;
+// export { vintel };
+export default vintel;
 // module.exports.vintelEvent = vintelEvent;
