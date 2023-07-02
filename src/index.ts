@@ -494,7 +494,8 @@ const vintel: any = {
       'APP Config: ',
       vintel.appConfig,
     );
-    if (vintel.oTAVersion !== vintel.versionNumber) {
+    if (vintel.oTAVersion !== vintel.versionNumber && !true) {
+      // force to continue without version update
       // Confirm Dialog needs to be shown
       vintel.event.emit('any', {
         status: 'OTA-Update',
