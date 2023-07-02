@@ -1,8 +1,8 @@
 
-  # @vintel/ble-plugin  
+  # Installation  
   Simply install the plugin with following command
   ````
-  npm i @vintel/ble-plugin
+  npm i vintel-cordova
   ````
   The plugin has depecency on `cordova-plugin-ble-central`, which can be installed based on instructions mentioned in following repository
   https://github.com/don/cordova-plugin-ble-central
@@ -12,8 +12,6 @@
   $ cordova plugin add cordova-plugin-ble-central --variable BLUETOOTH_USAGE_DESCRIPTION="Your description here" --variable IOS_INIT_ON_LOAD=true|false --variable BLUETOOTH_RESTORE_STATE=true|false --variable ACCESS_BACKGROUND_LOCATION=true|false
   ````
   
-  
-
   ## Methods
   The plugin offers following Methods:
   
@@ -31,40 +29,6 @@
   ```
   .... // other package import
   const vintel = require("vintel-cordova").default
-  ```
-  ## Prebuilt Components/Templates 🔥  
-  You can checkout prebuilt components and templates by clicking on the 'Add Section' button or menu icon
-  on the top left corner of the navbar.
-      
-  ## Save Readme ✨  
-  Once you're done, click on the save button to download and save your ReadMe!
-  
-  # @vintel/ble-plugin  
-  Simply install the plugin with following command
-  ````
-  npm i @vintel/ble-plugin
-  ````
-  The plugin has depecency on `cordova-plugin-ble-central`, which can be installed based on instructions mentioned in following repository
-  https://github.com/don/cordova-plugin-ble-central
-
-  For the Cordova project you can install the plugin as given below (for more info, kindly check the plugin repository)
-  ````
-  $ cordova plugin add cordova-plugin-ble-central --variable BLUETOOTH_USAGE_DESCRIPTION="Your description here" --variable IOS_INIT_ON_LOAD=true|false --variable BLUETOOTH_RESTORE_STATE=true|false --variable ACCESS_BACKGROUND_LOCATION=true|false
-  ````
-
-  ## Methods
-  The plugin offers following Methods:
-  
-  1. init
-  2. scan
-
-  Complete usage for the functions is given below
-
-  ### 1. init 
-  This function is used to initialize the plugin
-  ```
-  .... // other package import
-  const vintel = require("vintel");
   ....
   // config is optional, bydefault it will use the necessary config required to work with vintel modules
   const config = {
