@@ -30,7 +30,7 @@
   This function is used to initialize the plugin
   ```
   .... // other package import
-  const vintel = require("vintel").default
+  const vintel = require("vintel-cordova").default
   ```
   ## Prebuilt Components/Templates 🔥  
   You can checkout prebuilt components and templates by clicking on the 'Add Section' button or menu icon

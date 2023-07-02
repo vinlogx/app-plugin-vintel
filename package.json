@@ -1,5 +1,5 @@
 {
-  "name": "@vintel/ble-plugin",
+  "name": "vintel-cordova",
   "version": "1.0.1",
   "description": "Vintel package to work with cordova applications with BLE Central",
   "main": "dist/index.js",
