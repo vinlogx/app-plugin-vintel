@@ -375,7 +375,7 @@ const vintel: any = {
     let longitude;
     const result: any = await promise;
     if (result !== 400) {
-      if (window.location.host === '192.168.2.221:8100') {
+      if (window.location.port === '8100') {
         latitude = '40.0583';
         longitude = '74.4057';
       } else {
@@ -430,7 +430,9 @@ const vintel: any = {
     // let isDataSent = false;
 
     // This Point Arr Break Condition Send Data
-    if ((navigator as any).connection.type === 'none') {
+    const tempNavigator = navigator as any;
+    const noConnection = tempNavigator.connection && tempNavigator.connection.type === 'none'
+    if (noConnection) {
       vintel.event.emit('any', {
         status: 'error',
         message: 'No Internet!',
@@ -441,7 +443,7 @@ const vintel: any = {
       // let timesRun = 0;
       const interval = setInterval(() => {
         // timesRun += 1;
-        if ((navigator as any).connection.type !== 'none') {
+        if (noConnection) {
           clearInterval(interval);
           error({ message: 'retrying submit' });
           // isDataSent = true;
