@@ -2,7 +2,7 @@
   # Installation  
   Simply install the plugin with following command
   ````
-  npm i vintel-cordova
+  npm i vintel-plugin
   ````
   The plugin has depecency on `cordova-plugin-ble-central`, which can be installed based on instructions mentioned in following repository
   https://github.com/don/cordova-plugin-ble-central
@@ -28,9 +28,8 @@
   This function is used to initialize the plugin
   ```
   .... // other package import
-  const vintel = require("vintel-cordova").default
+  import vintel from "vintel-plugin"
   ....
-  // config is optional, bydefault it will use the necessary config required to work with vintel modules
   const config = {
       mode: "prod", // or dev,
       aws: {
@@ -40,11 +39,10 @@
             secretAccessKey: '{aws-secret-access-key}',
           },
         },
+      returnConfig: true // default is false, if you need to see data received from AWS, set it true,  
   }
 
   vintel.init(config);
-  // or without config
-  vintel.init(); 
   ```
   ### 2. scan
   This method is used to scan and connect to avaialble Vintel BLE Modules
@@ -75,7 +73,7 @@ This plugin offer events which can be used for to listening to various events.
 e.g.
 ````
 // initialize
-vintel.init();
+vintel.init(config);
 // start listening
 vintel.event.on("any", (event: any) => {
   switch (event.status) {
@@ -143,5 +141,5 @@ C011	            Unable to send data to server.	          Unable to send data to
 ```
 
 For any issue of query, you can file bugs at:
-https://github.com/fullstack202/vintel-cordova/issues
+https://github.com/vinlogx/app-plugin-vintel/issues
  

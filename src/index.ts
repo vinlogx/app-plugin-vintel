@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 // Utils
 import AWSS3 from './AWS_S3';
-import { AWSOptions, callback } from './definitions';
+import { AWSOptions, callback, vintelConfig } from './definitions';
 import VintelEvent from './Event/VintelEvent';
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
@@ -24,6 +24,7 @@ declare global {
 }
 
 const vintel: any = {
+  mode: 'test',
   service: '63DBC55A-1984-4EE5-93C2-3CB06B3BBEB2',
   device: {},
   totalChunks: null,
@@ -40,27 +41,58 @@ const vintel: any = {
   s3Client: null,
   appConfig: null,
   firmwareUpdate: null,
-  init: function (config: AWSOptions) {
+  init: function (config: vintelConfig) {
     return new Promise(async (resolve, reject) => {
-      const awsOpts = config ?? {
-        mode: 'prod',
+      const awsOpts: any = {
+        mode: 'dev',
         aws: {
-          region: 'us-east-2',
+          region: '',
           credentials: {
-            accessKeyId: 'AKIAZCNVN6KBI3YGOVL5',
-            secretAccessKey: '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',
+            accessKeyId: '',
+            secretAccessKey: '',
           },
         },
       };
+      console.log('config', config);
+      if (!config) {
+        reject('Config is required');
+      } else {
+        if (config.mode && ['dev', 'prod'].indexOf(config.mode) > -1) {
+          awsOpts.mode = config.mode;
+          vintel.mode = config.mode;
+        }
+
+        if (!config.aws) {
+          reject('aws config is required');
+        } else {
+          if (!config.aws.region || config.aws.region === '') {
+            reject('aws region config is required');
+          }
+
+          if (!config.aws.accessKeyId || config.aws.accessKeyId === '') {
+            reject('aws accessKeyId config is required');
+          }
+
+          if (!config.aws.secretAccessKey || config.aws.secretAccessKey === '') {
+            reject('aws secretAccessKey config is required');
+          }
+          awsOpts.aws.region = config.aws.region;
+          awsOpts.aws.credentials.accessKeyId = config.aws.accessKeyId;
+          awsOpts.aws.credentials.secretAccessKey = config.aws.secretAccessKey;
+        }
+      }
+
       try {
         vintel.s3Client = new AWSS3(awsOpts);
         let configData = await vintel.s3Client.getConfig();
         configData = JSON.parse(configData);
-        console.log('AWS', typeof configData);
         vintel.appConfig = configData;
         vintel.oTAVersion = configData.OTAVesrsion || configData.OTAVersion;
-
-        resolve(configData);
+        if (config.returnConfig) {
+          resolve(configData);
+        } else {
+          resolve(true);
+        }
       } catch (err: any) {
         console.log('AWS Error', err);
         reject(err);
@@ -491,8 +523,6 @@ const vintel: any = {
   checkOTA: function (success: callback, failure: callback) {
     console.log(
       'Check Ota Version ____________________________________' + vintel.oTAVersion + '!=   ' + vintel.versionNumber,
-      'APP Config: ',
-      vintel.appConfig,
     );
     if (vintel.oTAVersion !== vintel.versionNumber && !true) {
       // force to continue without version update
@@ -675,7 +705,14 @@ function sendDataToAWS(data: any) {
 }
 
 const httpRequest = async (type: number, data: any) => {
-  const url = 'https://x7fox1ym7a.execute-api.us-east-2.amazonaws.com/dev/sqs';
+  let url = 'https://gwm1w694tl.execute-api.us-east-2.amazonaws.com';
+  if (vintel.mode === 'dev') {
+    url += '/dev/sqs';
+  } else if (vintel.mode === 'prod') {
+    url += '/v1/sqs';
+  } else {
+    url = 'https://x7fox1ym7a.execute-api.us-east-2.amazonaws.com/dev/sqs';
+  }
   const headers: any = { 'Content-Type': 'application/json' };
   if (type === 1) {
     // need to handle here

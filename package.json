@@ -1,5 +1,5 @@
 {
-  "name": "vintel-cordova",
+  "name": "vintel-plugin",
   "version": "1.0.3",
   "description": "Vintel package to work with cordova applications with BLE Central",
   "main": "dist/index.js",
@@ -24,7 +24,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "Vintel"
+    "Vintel",
+    "vintel-ble",
+    "vintel-cordova",
+    "vintel-capacitor",
+    "vintel-sdk"
   ],
   "author": "Erion Pelingu",
   "license": "ISC",
@@ -37,10 +41,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fullstack202/vintel-cordova.git"
+    "url": "git+https://github.com/vinlogx/app-plugin-vintel.git"
   },
   "bugs": {
-    "url": "https://github.com/fullstack202/vintel-cordova/issues"
+    "url": "https://github.com/vinlogx/app-plugin-vintel/issues"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.354.0"

@@ -17,7 +17,6 @@ export interface awsConfig {
 
 export interface AWSOptions {
   mode?: string;
-  accountId: string;
   aws: awsConfig;
 }
 
@@ -25,3 +24,9 @@ export type VintelEvent = {
   name: string;
   callback: (args?: object | string) => void;
 };
+
+export interface vintelConfig {
+  mode?: string;
+  aws: awsConfig;
+  returnConfig: boolean
+}
