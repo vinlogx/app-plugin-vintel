@@ -27,6 +27,7 @@ export type VintelEvent = {
 
 export interface vintelConfig {
   mode?: string;
+  apiKey: string;
   aws: awsConfig;
-  returnConfig: boolean
+  returnConfig: boolean;
 }

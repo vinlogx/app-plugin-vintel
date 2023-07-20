@@ -25,6 +25,7 @@ declare global {
 
 const vintel: any = {
   mode: 'test',
+  awsAPIKey: null,
   service: '63DBC55A-1984-4EE5-93C2-3CB06B3BBEB2',
   device: {},
   totalChunks: null,
@@ -45,6 +46,7 @@ const vintel: any = {
     return new Promise(async (resolve, reject) => {
       const awsOpts: any = {
         mode: 'dev',
+        apiKey: null,
         aws: {
           region: '',
           credentials: {
@@ -60,6 +62,12 @@ const vintel: any = {
         if (config.mode && ['dev', 'prod'].indexOf(config.mode) > -1) {
           awsOpts.mode = config.mode;
           vintel.mode = config.mode;
+        }
+
+        if (!config.apiKey) {
+          reject('aws apiKey is required');
+        } else {
+          vintel.awsAPIKey = config.apiKey;
         }
 
         if (!config.aws) {
@@ -431,7 +439,7 @@ const vintel: any = {
 
     // This Point Arr Break Condition Send Data
     const tempNavigator = navigator as any;
-    const noConnection = tempNavigator.connection && tempNavigator.connection.type === 'none'
+    const noConnection = tempNavigator.connection && tempNavigator.connection.type === 'none';
     if (noConnection) {
       vintel.event.emit('any', {
         status: 'error',
@@ -561,6 +569,30 @@ const vintel: any = {
       );
     }
   },
+  stopScan: function (success?: callback, error?: callback, message?: string, errorCode?: string) {
+    ble.stopScan(
+      function () {
+        const data: any = { status: 'ScanningStopped', data: 'Scanning Stopped' };
+        if (message) {
+          data.data = message;
+        }
+        if (errorCode) {
+          data.errorCode = errorCode;
+        }
+
+        vintel.event.emit('any', data);
+        if (typeof success === 'function') {
+          success();
+        }
+      },
+      function (err: any) {
+        console.log('Scanning Stop Error');
+        if (typeof error === 'function') {
+          error(err);
+        }
+      },
+    );
+  },
 };
 
 function continueProcess(success: callback, failure: callback) {
@@ -598,7 +630,7 @@ function handleScanning(
     const vintelDevices = ['VinTel_OBD2', 'Vintel_DFU'];
     const vintelDevicesList: any = [];
     vintel.event.emit('any', { status: 'Scanning' });
-    let scanStopHandlerAdded = false;
+    const scanStopHandlerAdded = false;
     ble.startScan(
       services,
       async function (device: any) {
@@ -609,40 +641,19 @@ function handleScanning(
           if (vintelDevices.indexOf(device.name) > -1) {
             vintel.event.emit('any', { status: 'DeviceFound', data: device });
             vintelDevicesList.push(device);
-            ble.stopScan(
-              function () {
-                console.log('Device found, stop scanning');
-                vintel.event.emit('any', { status: 'ScanningStopped', data: 'Vitel Device found' });
-              },
-              function () {
-                console.log('Scanning Stop Error');
-              },
-            );
+            vintel.stopScan(null, null, 'VinTel Device found');
             resolve({ devices: vintelDevicesList });
           }
 
-          if (!scanStopHandlerAdded) {
-            setTimeout(function () {
-              if (!vintelDevicesList.length) {
-                vintel.event.emit('any', {
-                  status: 'error',
-                  errorCode: 'C004',
-                  message: 'No Vintel Module/Device found.',
-                });
-                resolve({ devices: [] });
-                ble.stopScan(
-                  function () {
-                    console.log('Device Not found, stop scanning');
-                    vintel.event.emit('any', { status: 'ScanningStopped', data: 'No Vintel Module/Device found.' });
-                  },
-                  function () {
-                    console.log('Scanning Stop Error');
-                  },
-                );
-              }
-            }, duration * 1000);
-            scanStopHandlerAdded = true;
-          }
+          // if (!scanStopHandlerAdded) {
+          //   setTimeout(function () {
+          //     if (!vintelDevicesList.length) {
+          //       vintel.stopScan(null, null, 'No VinTel Module/Device found.', 'C004');
+          //       resolve({ devices: [] });
+          //     }
+          //   }, duration * 1000);
+          //   scanStopHandlerAdded = true;
+          // }
         }
       },
       function (error: any) {
@@ -716,6 +727,9 @@ const httpRequest = async (type: number, data: any) => {
     url = 'https://x7fox1ym7a.execute-api.us-east-2.amazonaws.com/dev/sqs';
   }
   const headers: any = { 'Content-Type': 'application/json' };
+  if (vintel.mode === 'dev' || (vintel.mode === 'prod' && vintel.awsAPIKey)) {
+    headers['x-api-key'] = vintel.awsAPIKey;
+  }
   if (type === 1) {
     // need to handle here
   }

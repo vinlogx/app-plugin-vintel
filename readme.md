@@ -32,6 +32,7 @@
   ....
   const config = {
       mode: "prod", // or dev,
+      apiKey: "{aws api key to make call}",
       aws: {
           region: '{aws-region}', // e.g. us-east-2
           credentials: {
