@@ -742,7 +742,7 @@ const httpRequest = async (type: number, data: any) => {
         xmlhttp.setRequestHeader(key, headers[key]);
       });
     }
-    xmlhttp.send(JSON.stringify(data));
+    xmlhttp.send(data);
     xmlhttp.onreadystatechange = function () {
       if (xmlhttp.readyState === 4) {
         let response = null;
