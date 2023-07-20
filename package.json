@@ -1,6 +1,6 @@
 {
   "name": "vintel-plugin",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Vintel package to work with cordova applications with BLE Central",
   "main": "dist/index.js",
   "module": "dist/index.js",
