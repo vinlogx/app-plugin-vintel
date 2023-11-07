@@ -1,8 +1,9 @@
 /* eslint-disable no-undef */
 // Utils
 import AWSS3 from './AWS_S3';
-import { AWSOptions, callback, vintelConfig } from './definitions';
+import { callback, vintelConfig } from './definitions';
 import VintelEvent from './Event/VintelEvent';
+import { v4 as uuidv4 } from 'uuid';
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   let binary = '';
@@ -409,6 +410,7 @@ const vintel: any = {
     // const dateTime = dateValue + ' ' + time;
     // const timeStamp = dateTime;
     const timeStamp = new Date().toISOString();
+    const refId = uuidv4();
 
     if (device.deviceType === true) {
       deviceType = 'Physical';
@@ -486,6 +488,7 @@ const vintel: any = {
                 .replace(/[&/\\#+()$~%.'"*?<>]/g, '')
                 .trim(),
               device: deviceInfo,
+              referenceId: refId,
             };
             console.log('Sending 1 error', finalData);
             // postAdvanceHttp1(JSON.stringify(finalData), callback);
@@ -497,17 +500,19 @@ const vintel: any = {
     } else {
       try {
         // JSON.parse(finalData)
+        const tempFinalData: any = JSON.parse(finalData);
+        tempFinalData.referenceId = refId;
         console.log('Sending 3', finalData);
         // await postAdvanceHttp(finalData, callback);
         vintel.event.emit('event', {
           status: 'AWSRequest',
-          data: JSON.parse(finalData),
+          data: tempFinalData,
         });
-        const response = await httpRequest(0, finalData);
+        const response = await httpRequest(0, JSON.stringify(tempFinalData));
 
         vintel.event.emit('event', {
           status: 'AWSResponse',
-          data: { response, timeStamp },
+          data: { response, timeStamp, referenceId: refId },
         });
         console.log('AWS response: ', response);
         vintel.checkOTA(success, error);
@@ -528,6 +533,7 @@ const vintel: any = {
             .replace(/[&/\\#+()$~%.'"*?<>]/g, '')
             .trim(),
           device: deviceInfo,
+          referenceId: refId,
         };
         // postAdvanceHttp1(JSON.stringify(finalData), callback);
         console.log('sending 3 err', e, finalData);
