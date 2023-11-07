@@ -117,13 +117,13 @@ const vintel: any = {
       },
       function () {
         // Let's try to enable it and if succeed, start scanning again
-        vintel.event.emit('any', { status: 'error', message: 'Bluetooth Not Enabled.', errorCode: 'C002' });
+        vintel.event.emit('event', { status: 'error', message: 'Bluetooth Not Enabled.', errorCode: 'C002' });
         ble.enable(
           function () {
             handleScanning(services, autoConnect, duration, success, failure);
           },
           function (err: any) {
-            vintel.event.emit('any', {
+            vintel.event.emit('event', {
               status: 'error',
               message: 'Unable to enable Bluetooth Service.',
               errorCode: 'C005',
@@ -201,11 +201,11 @@ const vintel: any = {
       deviceId,
       function (resp: any) {
         vintel.discoverCharacteristics(resp);
-        vintel.event.emit('any', { status: 'Connected' });
+        vintel.event.emit('event', { status: 'Connected' });
         success(resp);
       },
       function (err: any) {
-        vintel.event.emit('any', { status: 'error', errorCode: 'C003', message: 'Unable to connect to device.' });
+        vintel.event.emit('event', { status: 'error', errorCode: 'C003', message: 'Unable to connect to device.' });
         failure(err);
       },
     );
@@ -233,12 +233,19 @@ const vintel: any = {
           vintel.scanDataList.push(result);
         }
         console.log('read result', result, vintel.totalChunkCount, vintel.scanDataList);
-        vintel.event.emit('any', { status: 'Reading', data: result.indexOf('{') > -1 ? JSON.parse(result) : result });
+        try {
+          vintel.event.emit('event', {
+            status: 'Reading',
+            data: result.indexOf('{') > -1 ? JSON.parse(result) : result,
+          });
+        } catch (err) {
+          console.log('json parse error', err);
+        }
         vintel.write(vintel.writeChar, success, failure);
         // success(response)
       },
       function (err: any) {
-        vintel.event.emit('any', {
+        vintel.event.emit('event', {
           status: 'error',
           errorCode: 'C008',
           message: 'Unable to read data from the device.',
@@ -258,12 +265,12 @@ const vintel: any = {
           charUUID,
           buffres,
           () => {
-            vintel.event.emit('any', { status: 'Writing', data: 'OK' });
+            vintel.event.emit('event', { status: 'Writing', data: 'OK' });
             vintel.read(vintel.device.id, vintel.service, vintel.readChar, success, failure);
           },
           (err: any) => {
             vintel.scanDataList = [];
-            vintel.event.emit('any', {
+            vintel.event.emit('event', {
               status: 'error',
               errorCode: 'C009',
               message: 'Unable to write data to the device.',
@@ -298,7 +305,7 @@ const vintel: any = {
         );
         if (vintel.completeOTA === false) {
           console.log('Sending Data');
-          vintel.event.emit('any', { status: 'SendComplete' });
+          vintel.event.emit('event', { status: 'SendComplete' });
 
           // vintel.completeChunk(function (resp) {
           // console.log("chunk completed", resp)
@@ -312,7 +319,7 @@ const vintel: any = {
         }
       },
       function (err: any) {
-        vintel.event.emit('any', {
+        vintel.event.emit('event', {
           status: 'error',
           errorCode: 'C008',
           message: 'Unable to read data from the device.',
@@ -326,12 +333,12 @@ const vintel: any = {
       vintel.device.id,
       () => {
         console.log('disconnect Device _________________________' + vintel.completeOTA + ' !!');
-        vintel.event.emit('any', { status: 'Disconnected' });
+        vintel.event.emit('event', { status: 'Disconnected' });
         success();
       },
       function (err: any) {
         console.log('Disconnect Error', err);
-        vintel.event.emit('any', { status: 'error', errorCode: 'C010', message: 'Unable disconnect device.' });
+        vintel.event.emit('event', { status: 'error', errorCode: 'C010', message: 'Unable disconnect device.' });
         failure(err);
       },
     );
@@ -396,11 +403,13 @@ const vintel: any = {
     }
 
     let deviceType;
-    const today = new Date();
-    const dateValue = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    const time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-    const dateTime = dateValue + ' ' + time;
-    const timeStamp = dateTime;
+    // const today = new Date();
+    // const dateValue = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    // const time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+    // const dateTime = dateValue + ' ' + time;
+    // const timeStamp = dateTime;
+    const timeStamp = new Date().toISOString();
+
     if (device.deviceType === true) {
       deviceType = 'Physical';
     } else {
@@ -417,7 +426,7 @@ const vintel: any = {
       serialNumber: device.uuid,
       platform: device.platform,
       appType: 'Cordova-Android',
-      pluginVer: '1.0.1',
+      pluginVer: '1.0.2',
     };
     const softwareVersionNumber = deviceInfo.versionString;
     const deviceData = {
@@ -441,7 +450,7 @@ const vintel: any = {
     const tempNavigator = navigator as any;
     const noConnection = tempNavigator.connection && tempNavigator.connection.type === 'none';
     if (noConnection) {
-      vintel.event.emit('any', {
+      vintel.event.emit('event', {
         status: 'error',
         message: 'No Internet!',
         errorCode: 'C001',
@@ -490,15 +499,15 @@ const vintel: any = {
         // JSON.parse(finalData)
         console.log('Sending 3', finalData);
         // await postAdvanceHttp(finalData, callback);
-        vintel.event.emit('any', {
+        vintel.event.emit('event', {
           status: 'AWSRequest',
           data: JSON.parse(finalData),
         });
         const response = await httpRequest(0, finalData);
 
-        vintel.event.emit('any', {
+        vintel.event.emit('event', {
           status: 'AWSResponse',
-          data: response,
+          data: { response, timeStamp },
         });
         console.log('AWS response: ', response);
         vintel.checkOTA(success, error);
@@ -522,8 +531,8 @@ const vintel: any = {
         };
         // postAdvanceHttp1(JSON.stringify(finalData), callback);
         console.log('sending 3 err', e, finalData);
-        vintel.event.emit('any', { status: 'error', errorCode: 'C011', message: 'Unable to send data to server.' });
-        vintel.event.emit('any', {
+        vintel.event.emit('event', { status: 'error', errorCode: 'C011', message: 'Unable to send data to server.' });
+        vintel.event.emit('event', {
           status: 'AWSError',
           data: { message: e.message },
         });
@@ -537,7 +546,7 @@ const vintel: any = {
     if (vintel.oTAVersion !== vintel.versionNumber && !true) {
       // force to continue without version update
       // Confirm Dialog needs to be shown
-      vintel.event.emit('any', {
+      vintel.event.emit('event', {
         status: 'OTA-Update',
         data: { OTAVersion: vintel.oTAVersion, version: vintel.versionNumber },
       });
@@ -545,7 +554,7 @@ const vintel: any = {
     } else {
       console.log('Equal Ota Version ' + vintel.oTAVersion + '!=   ' + vintel.versionNumber);
       // alert("Invalid DSR scan data found Please restart the module and try again")
-      vintel.event.emit('any', {
+      vintel.event.emit('event', {
         status: 'OTA-UPToDate',
         data: { OTAVersion: vintel.oTAVersion, version: vintel.versionNumber },
       });
@@ -580,7 +589,7 @@ const vintel: any = {
           data.errorCode = errorCode;
         }
 
-        vintel.event.emit('any', data);
+        vintel.event.emit('event', data);
         if (typeof success === 'function') {
           success();
         }
@@ -629,7 +638,7 @@ function handleScanning(
     const devicesNameArr: any = [];
     const vintelDevices = ['VinTel_OBD2', 'Vintel_DFU'];
     const vintelDevicesList: any = [];
-    vintel.event.emit('any', { status: 'Scanning' });
+    vintel.event.emit('event', { status: 'Scanning' });
     const scanStopHandlerAdded = false;
     ble.startScan(
       services,
@@ -639,7 +648,7 @@ function handleScanning(
           devicesArr.push(device);
           devicesNameArr.push(device.name);
           if (vintelDevices.indexOf(device.name) > -1) {
-            vintel.event.emit('any', { status: 'DeviceFound', data: device });
+            vintel.event.emit('event', { status: 'DeviceFound', data: device });
             vintelDevicesList.push(device);
             vintel.stopScan(null, null, 'VinTel Device found');
             resolve({ devices: vintelDevicesList });
@@ -657,7 +666,7 @@ function handleScanning(
         }
       },
       function (error: any) {
-        vintel.event.emit('any', { status: 'error', errorCode: 'C007', message: 'Device scanning failed' });
+        vintel.event.emit('event', { status: 'error', errorCode: 'C007', message: 'Device scanning failed' });
         reject(error);
       },
     );
@@ -672,12 +681,12 @@ function handleScanning(
         ble.connect(
           resp.devices[0].id,
           function (resp: any) {
-            vintel.event.emit('any', { status: 'Connected', device: resp });
+            vintel.event.emit('event', { status: 'Connected', device: resp });
             vintel.discoverCharacteristics(resp);
             success(resp);
           },
           function (err: any) {
-            vintel.event.emit('any', { status: 'Disconnected', error: err });
+            vintel.event.emit('event', { status: 'Disconnected', error: err });
           },
         );
       } else {
