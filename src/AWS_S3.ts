@@ -15,6 +15,8 @@ export default class AWSS3 {
   constructor(opts: AWSOptions) {
     if (opts.mode && opts.mode === AWSModes.DEV) {
       this.configFileName = 'Resources_Plugin_Test.json';
+    } else if (opts.mode && opts.mode === AWSModes.STAG) {
+      this.configFileName = 'Resources_Plugin_Stag.json';
     } else {
       this.configFileName = 'Resources_Plugin.json';
     }

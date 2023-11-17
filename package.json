@@ -1,6 +1,6 @@
 {
   "name": "vintel-plugin",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Vintel package to work with cordova applications with BLE Central",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -33,7 +33,7 @@
   "author": "Erion Pelingu",
   "license": "ISC",
   "devDependencies": {
-    "@types/uuid": "^9.0.6",
+    "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
     "eslint": "^8.43.0",

@@ -4,6 +4,7 @@ export interface callback {
 
 export enum AWSModes {
   DEV = 'dev',
+  STAG = 'stag',
   PROD = 'prod',
 }
 

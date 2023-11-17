@@ -56,7 +56,6 @@ const vintel: any = {
           },
         },
       };
-      console.log('config', config);
       if (!config) {
         reject('Config is required');
       } else {
@@ -512,7 +511,7 @@ const vintel: any = {
 
         vintel.event.emit('event', {
           status: 'AWSResponse',
-          data: { response, timeStamp, referenceId: refId },
+          data: { AWSResponse: response, timeStamp, referenceId: refId },
         });
         console.log('AWS response: ', response);
         vintel.checkOTA(success, error);
@@ -733,14 +732,7 @@ function sendDataToAWS(data: any) {
 }
 
 const httpRequest = async (type: number, data: any) => {
-  let url = 'https://gwm1w694tl.execute-api.us-east-2.amazonaws.com';
-  if (vintel.mode === 'dev') {
-    url += '/dev/sqs';
-  } else if (vintel.mode === 'prod') {
-    url += '/v1/sqs';
-  } else {
-    url = 'https://x7fox1ym7a.execute-api.us-east-2.amazonaws.com/dev/sqs';
-  }
+  const url = vintel.appConfig.SQSUrl;
   const headers: any = { 'Content-Type': 'application/json' };
   if (vintel.mode === 'dev' || (vintel.mode === 'prod' && vintel.awsAPIKey)) {
     headers['x-api-key'] = vintel.awsAPIKey;
@@ -774,68 +766,4 @@ const httpRequest = async (type: number, data: any) => {
   });
 };
 
-// eslint-disable-next-line no-unused-vars
-// function sendData() {
-//   try {
-//     const header = {
-//       'Content-Type': 'application/json;',
-//       'us-east-2_e1BEH0iiW': 'WTFQJFduva8NSR0wPuWFI952Mr2q2JQVaVC9oBbI'
-//     };
-//     cordova.plugin.http.setDataSerializer('utf8');
-//     cordova.plugin.http.post(
-//       "https://sz5hnn73y4.execute-api.us-east-2.amazonaws.com/prod/sqs",
-//       jsondata,
-//       header
-//       , function (response) {
-//         // alert(" blecentral data == " + JSON.stringify(response));
-//         //  alert("RESPONSE" + JSON.stringify(response));
-//         console.log("Deta send  _______________________" + JSON.stringify(response))
-//         resModel.status = constant.Status.completed;
-//         resModel.message = "Data sent successfully to VINTEL cloud";
-//         callback(resModel);
-//       }, function (error) {
-//         resModel.status = constant.Status.error;
-//         resModel.statusCode = constant.StatusCode.dataSendFailedToServer;
-//         resModel.message = constant.Message.c011_dataSendFailedToServer;
-//         callback(resModel);
-//       });
-//   } catch (err) {
-//     errorMsg(err, callback);
-//   }
-// }
-
-// function sendNotification() {
-//   try {
-//     const header = {
-//       'Content-Type': 'application/json;',
-//       'us-east-2_e1BEH0iiW': 'Ac7suMvqqreQxGti3fb5qgdqp14I3EbOBWbLRhgD'
-//     };
-
-//     cordova.plugin.http.setDataSerializer('utf8');
-//     cordova.plugin.http.post(
-//       "https://sz5hnn73y4.execute-api.us-east-2.amazonaws.com/prod/sqs-notify",
-//       jsondata,
-//       header
-//       , function (response) {
-//         // alert("RESPONSE" + JSON.stringify(response));
-//         //    var obj = jsondata;
-//         resModel.status = constant.Status.completed;
-//         resModel.message = "Data sent successfully to VINTEL cloud";
-//         //    resModel.vin = obj.vehicle.info.vin;
-//         callback(resModel);
-//       }, function (error) {
-//         alert("error111111" + JSON.stringify(error));
-//         resModel.status = constant.Status.error;
-//         resModel.statusCode = constant.StatusCode.dataSendFailedToServer;
-//         resModel.message = constant.Message.c011_dataSendFailedToServer;
-//         callback(resModel);
-//       })
-//   } catch (err) {
-//     // alert("error111111" + JSON.stringify(error));
-//     errorMsg(err, callback);
-//   }
-// }
-
-// export { vintel };
 export default vintel;
-// module.exports.vintelEvent = vintelEvent;
