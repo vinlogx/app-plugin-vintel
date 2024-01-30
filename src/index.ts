@@ -4,6 +4,7 @@ import AWSS3 from './AWS_S3';
 import { callback, vintelConfig } from './definitions';
 import VintelEvent from './Event/VintelEvent';
 import { v4 as uuidv4 } from 'uuid';
+import { PLUGIN_VERSION } from './version';
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   let binary = '';
@@ -426,8 +427,8 @@ const vintel: any = {
       timeStamp,
       serialNumber: device.uuid,
       platform: device.platform,
-      appType: 'Cordova-Android',
-      pluginVer: '1.0.2',
+      appType: 'Cordova-Plugin',
+      pluginVer: PLUGIN_VERSION,
     };
     const softwareVersionNumber = deviceInfo.versionString;
     const deviceData = {
